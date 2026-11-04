@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# data (too large for GitHub / re-downloadable)
+SA1/
+TERR/
+statsnz-territorial-authority-2018-generalised-SHP/
+Statistical Area 1 dataset for Census 2018-total-New Zealand_updated_4-11-21/
+World_Cities/
+*.zip
+*.tif
+*.gpkg

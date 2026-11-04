@@ -1,0 +1,62 @@
+---
+title: "Tutorial 1"
+output: html_document
+date: "2026-10-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+STEP 1 READ DATA
+=============================
+```{r}
+library(here)      # paths are built from the project root (CASA0005_Workspace.Rproj)
+library(tidyverse)
+library(sf)
+library(readxl)
+d <- read_excel(here("TERR", "2018-SA1-dataset-individual-part-3a-total-NZ_updated_16-7-20.xlsx"), sheet = 8, skip = 9)
+shape <- st_read(here("statsnz-territorial-authority-2018-generalised-SHP", "territorial-authority-2018-generalised.shp"))
+summary(shape)
+print("done")
+```
+STEP 2 CLEAN DATA AND EXTRACT GEOM
+=============================
+```{r}
+shape %>%
+  st_geometry() %>%
+  plot()
+```
+STEP 3 MERGE DATA
+=============================
+```{r}
+shape2 <- shape%>%
+  merge(.,
+        d,
+        by.x="TA2018_V1_", #shape
+        by.y="Area_Code") #db
+```
+STEP 4 PLOT THEMATIC MAP (One column in a db)
+=============================
+```{r}
+grep("Employed Full time", names(shape2), ignore.case=TRUE, value=TRUE)
+#shape2 <- shape2 %>%
+  #rename(paid_employee_2018 = `Employed Full time...17`) %>%   # use your actual name
+  #mutate(paid_employee_2018 = as.numeric(paid_employee_2018))
+library(tmap)
+tm_shape(shape2) +
+  tm_polygons(fill = "paid_employee_2018",
+              fill.scale  = tm_scale_intervals(style = "quantile", n = 5),
+              fill.legend = tm_legend(title = "Employed full time, 2018"))
+hist(log(shape2$paid_employee_2018),
+     breaks = 20,
+     main = "Employed full time, 2018 (log scale)",
+     xlab = "log(number of people)")
+```
+

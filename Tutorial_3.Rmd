@@ -1,0 +1,61 @@
+---
+title: "Tutorial_3"
+output: html_document
+date: "2026-10-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+STEP 1 LOAD PACKAGES
+```{r}
+library(here)
+library(tidyverse)
+library(terra)
+library(sf)
+```
+
+STEP 2 LOAD DATA AND CHECK CRS
+```{r}
+ukraine <- st_read("gadm41_UKR.gpkg")
+ssp1 <- rast("wc2.1_2.5m_tmin_ACCESS-CM2_ssp126_2081-2100.tif")
+ssp5 <- rast("wc2.1_2.5m_tmin_ACCESS-CM2_ssp585_2081-2100.tif")
+cities <- st_read(here("World_Cities", "World_Cities.shp"))
+same.crs(ssp1, vect(ukraine))
+cities <- st_transform(cities, st_crs(ukraine))
+cities_ukr <- dplyr::filter(cities, CNTRY_NAME == "Ukraine")
+```
+
+STEP 3 BUILD STACK AND CLIP
+```{r}
+ukr_vect <- vect(ukraine)
+ssp1_ukr <- crop(ssp1, ukr_vect) %>%
+  mask(ukr_vect)
+ssp5_ukr <- crop(ssp5, ukr_vect) %>%
+  mask(ukr_vect)
+diff_temps <- round(ssp5_ukr-ssp1_ukr,1)
+names(diff_temps) <- month.abb
+```
+
+STEP 4 EXTRACT TEMP FOR CITIES
+```{r}
+temps_ukr <- terra::extract(diff_temps, vect(cities_ukr))
+```
+
+STEP 5 MERGE WITH CITY NAMES
+```{r}
+cities_tbl <- cities_ukr %>%
+  st_drop_geometry() %>%
+  dplyr::select(CITY_NAME) %>%
+  mutate(ID = row_number())
+city_CC <- merge(cities_tbl,temps_ukr, by = "ID")
+
+```
+
