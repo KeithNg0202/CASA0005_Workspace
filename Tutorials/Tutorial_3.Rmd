@@ -24,9 +24,9 @@ library(sf)
 
 STEP 2 LOAD DATA AND CHECK CRS
 ```{r}
-ukraine <- st_read("gadm41_UKR.gpkg")
-ssp1 <- rast("wc2.1_2.5m_tmin_ACCESS-CM2_ssp126_2081-2100.tif")
-ssp5 <- rast("wc2.1_2.5m_tmin_ACCESS-CM2_ssp585_2081-2100.tif")
+ukraine <- st_read(here("gadm41_UKR.gpkg"))
+ssp1 <- rast(here("wc2.1_2.5m_tmin_ACCESS-CM2_ssp126_2081-2100.tif"))
+ssp5 <- rast(here("wc2.1_2.5m_tmin_ACCESS-CM2_ssp585_2081-2100.tif"))
 cities <- st_read(here("World_Cities", "World_Cities.shp"))
 same.crs(ssp1, vect(ukraine))
 cities <- st_transform(cities, st_crs(ukraine))

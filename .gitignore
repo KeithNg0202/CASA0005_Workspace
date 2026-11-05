@@ -12,3 +12,5 @@ World_Cities/
 *.zip
 *.tif
 *.gpkg
+hdr-data.*
+*.geojson

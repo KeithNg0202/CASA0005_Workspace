@@ -25,8 +25,8 @@ library(here)
 
 STEP 2 LOAD DATA AND CLEAN
 ```{r}
-geni <- read_csv("hdr-data.csv")
-countries <- st_read("World_Countries_(Generalized)_2173680399808997149.geojson")
+geni <- read_csv(here("hdr-data.csv"))
+countries <- st_read(here("World_Countries_(Generalized)_2173680399808997149.geojson"))
 geni_diff <- geni %>% dplyr::select(countryIsoCode, year, value, country) %>%
   pivot_wider(names_from = year, values_from = value, names_prefix = "gii_") %>%
   mutate(gii_diff = gii_2019 - gii_2010)
